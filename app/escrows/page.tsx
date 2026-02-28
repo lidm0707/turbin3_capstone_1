@@ -14,6 +14,7 @@ const idl = idlJson as any;
 import {
   PROGRAM_ID,
   userExists,
+  createUser,
   dealToken,
   refund,
   deriveUserPda,
@@ -255,7 +256,7 @@ export default function EscrowsPage() {
       // Check if user exists, create if not
       const userAccountExists = await userExists(provider, publicKey, program);
       if (!userAccountExists) {
-        throw new Error("Please create a user account first");
+        await createUser(provider, publicKey, program);
       }
 
       // Derive necessary addresses

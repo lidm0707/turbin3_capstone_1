@@ -11,7 +11,7 @@ import {
   getMint,
 } from "@solana/spl-token";
 import Link from "next/link";
-import idlJson from "../../../target/idl/capstone_1.json";
+import idlJson from "../../target/idl/capstone_1.json";
 import * as anchor from "@coral-xyz/anchor";
 
 // Use the IDL directly with type assertion
@@ -24,8 +24,8 @@ import {
   userExists,
   getOrCreateTokenAccount,
   toTokenAmount,
-} from "../../lib/solana";
-import { TOKEN_PROGRAM_ID } from "../../lib/constants";
+} from "../lib/solana";
+import { TOKEN_PROGRAM_ID } from "../lib/constants";
 
 export default function CreateEscrow() {
   const { publicKey, connected, signTransaction } = useWallet();

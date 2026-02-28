@@ -7,7 +7,7 @@ import { PublicKey } from "@solana/web3.js";
 import { Program, AnchorProvider, BN } from "@coral-xyz/anchor";
 import { getAssociatedTokenAddress, getMint } from "@solana/spl-token";
 import Link from "next/link";
-import idlJson from "../../../target/idl/capstone_1.json";
+import idlJson from "../../target/idl/capstone_1.json";
 
 const idl = idlJson as any;
 
@@ -20,7 +20,7 @@ import {
   deriveEscrowPda,
   deriveVaultAddress,
   toTokenAmount,
-} from "../../lib/solana";
+} from "../lib/solana";
 
 interface EscrowData {
   pda: PublicKey;

@@ -1,6 +1,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { Capstone1 } from "../target/types/capstone_1";
+// import { Capstone1 } from "../target/types/capstone_1";
+import { Capstone1 } from "../types/capstone_1";
 import {
   TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,

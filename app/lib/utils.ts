@@ -1,3 +1,24 @@
+import { Connection, PublicKey, ParsedAccountData } from "@solana/web3.js";
+import { getMint } from "@solana/spl-token";
+import { TOKEN_METADATA_PROGRAM_ID } from "./constants";
+
+/**
+ * Token metadata interface
+ */
+export interface TokenMetadata {
+  address: string;
+  decimals: number;
+  name: string;
+  symbol: string;
+  uri?: string;
+  image?: string;
+}
+
+/**
+ * Simple cache for token metadata
+ */
+const tokenMetadataCache = new Map<string, TokenMetadata>();
+
 /**
  * Format a wallet address for display
  * @param address The wallet address
@@ -22,7 +43,10 @@ export function formatWalletAddress(
  * @param decimals The number of decimals
  * @returns Formatted string
  */
-export function formatTokenAmount(amount: number, decimals: number = 6): string {
+export function formatTokenAmount(
+  amount: number,
+  decimals: number = 6
+): string {
   return (amount / 10 ** decimals).toFixed(decimals);
 }
 
@@ -115,8 +139,7 @@ export function isValidWalletAddress(address: string): boolean {
     return false;
   }
   // Base58 character set
-  const base58Regex =
-    /^[1-9A-HJ-NP-Za-km-z]+$/;
+  const base58Regex = /^[1-9A-HJ-NP-Za-km-z]+$/;
   return base58Regex.test(address);
 }
 
@@ -239,10 +262,7 @@ export function generateId(length: number = 16): string {
  * @param defaultValue The default value if conversion fails
  * @returns Number or default value
  */
-export function toNumber(
-  value: any,
-  defaultValue: number = 0
-): number {
+export function toNumber(value: any, defaultValue: number = 0): number {
   const num = Number(value);
   return isNaN(num) ? defaultValue : num;
 }
@@ -281,4 +301,180 @@ export function formatPercentage(value: number, decimals: number = 2): string {
  */
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
+}
+
+/**
+ * Derive the metadata PDA for a mint address
+ * @param mintAddress The token mint address
+ * @returns The metadata PDA
+ */
+export function deriveMetadataPDA(mintAddress: PublicKey): PublicKey {
+  const [metadataPDA] = PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("metadata"),
+      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+      mintAddress.toBuffer(),
+    ],
+    TOKEN_METADATA_PROGRAM_ID
+  );
+  return metadataPDA;
+}
+
+/**
+ * Fetch token metadata from the blockchain
+ * This function tries to fetch from the Token Metadata Program first,
+ * then falls back to basic mint info if metadata doesn't exist
+ * @param connection The Solana connection
+ * @param mintAddress The token mint address
+ * @param forceRefresh Force refresh even if cached
+ * @returns Token metadata or null if fetch fails
+ */
+export async function fetchTokenMetadata(
+  connection: Connection,
+  mintAddress: PublicKey,
+  forceRefresh: boolean = false
+): Promise<TokenMetadata | null> {
+  const addressString = mintAddress.toString();
+
+  // Check cache first
+  if (!forceRefresh && tokenMetadataCache.has(addressString)) {
+    return tokenMetadataCache.get(addressString)!;
+  }
+
+  try {
+    // Get basic mint info (always available)
+    const mintInfo = await getMint(connection, mintAddress);
+
+    // Try to fetch from Token Metadata Program
+    let name = mintAddress.toString().slice(0, 8) + "...";
+    let symbol = addressString.slice(0, 4);
+    let uri: string | undefined;
+    let image: string | undefined;
+
+    try {
+      const metadataPDA = deriveMetadataPDA(mintAddress);
+      const accountInfo = await connection.getAccountInfo(metadataPDA);
+
+      if (accountInfo && accountInfo.data) {
+        // Decode the metadata structure
+        const metadata = decodeTokenMetadata(accountInfo.data);
+        if (metadata) {
+          name = metadata.name;
+          symbol = metadata.symbol;
+          uri = metadata.uri;
+
+          // Try to fetch image from URI
+          if (uri) {
+            try {
+              const response = await fetch(uri);
+              if (response.ok) {
+                const json = await response.json();
+                image = json.image;
+              }
+            } catch (err) {
+              // URI fetch failed, continue without image
+              console.log("Failed to fetch token image from URI:", err);
+            }
+          }
+        }
+      }
+    } catch (err) {
+      // Metadata account doesn't exist or couldn't be fetched
+      // Use basic mint info as fallback
+      console.log("Token metadata not found, using basic info");
+    }
+
+    const metadata: TokenMetadata = {
+      address: addressString,
+      decimals: mintInfo.decimals,
+      name,
+      symbol,
+      uri,
+      image,
+    };
+
+    // Cache the result
+    tokenMetadataCache.set(addressString, metadata);
+
+    return metadata;
+  } catch (error) {
+    console.error("Error fetching token metadata:", error);
+    return null;
+  }
+}
+
+/**
+ * Decode Token Metadata Program data
+ * The metadata structure is Borsh-serialized
+ * @param data The account data buffer
+ * @returns Decoded metadata or null if decode fails
+ */
+function decodeTokenMetadata(data: Buffer): {
+  name: string;
+  symbol: string;
+  uri?: string;
+} | null {
+  try {
+    // The metadata structure is:
+    // - key (1 byte): 0x01 for uninitialized, 0x02 for initialized
+    // - update_authority (32 bytes)
+    // - mint (32 bytes)
+    // - name (4 bytes length + variable data)
+    // - symbol (4 bytes length + variable data)
+    // - uri (4 bytes length + variable data)
+    // - seller_fee_basis_points (2 bytes)
+    // - and more fields we don't need...
+
+    let offset = 1; // Skip key byte
+    offset += 32; // Skip update_authority
+    offset += 32; // Skip mint
+
+    // Read name length (4 bytes)
+    const nameLength = data.readUInt32LE(offset);
+    offset += 4;
+    // Read name data
+    const nameData = data.subarray(offset, offset + nameLength);
+    const name = nameData.toString("utf8").replace(/\0/g, "").trim();
+    offset += nameLength;
+
+    // Read symbol length (4 bytes)
+    const symbolLength = data.readUInt32LE(offset);
+    offset += 4;
+    // Read symbol data
+    const symbolData = data.subarray(offset, offset + symbolLength);
+    const symbol = symbolData.toString("utf8").replace(/\0/g, "").trim();
+    offset += symbolLength;
+
+    // Read URI length (4 bytes)
+    const uriLength = data.readUInt32LE(offset);
+    offset += 4;
+    // Read URI data
+    const uriData = data.subarray(offset, offset + uriLength);
+    const uri = uriData.toString("utf8").replace(/\0/g, "").trim();
+
+    return {
+      name: name || "Unknown Token",
+      symbol: symbol || "UNK",
+      uri: uri || undefined,
+    };
+  } catch (error) {
+    console.error("Error decoding token metadata:", error);
+    return null;
+  }
+}
+
+/**
+ * Clear the token metadata cache
+ * Useful for testing or when you want to force refresh
+ */
+export function clearTokenMetadataCache(): void {
+  tokenMetadataCache.clear();
+}
+
+/**
+ * Clear a specific token from the cache
+ * @param mintAddress The token mint address
+ */
+export function clearTokenFromCache(mintAddress: PublicKey): void {
+  tokenMetadataCache.delete(mintAddress.toString());
 }

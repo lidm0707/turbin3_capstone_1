@@ -34,9 +34,7 @@ export default function Header() {
             <Link href="/create" className={navLinkClass("/create")}>
               Create Offer
             </Link>
-            <Link href="/swap" className={navLinkClass("/swap")}>
-              Swap
-            </Link>
+
             <Link href="/escrows" className={navLinkClass("/escrows")}>
               View Offers
             </Link>
@@ -56,9 +54,6 @@ export default function Header() {
           </Link>
           <Link href="/create" className={navLinkClass("/create")}>
             Create
-          </Link>
-          <Link href="/swap" className={navLinkClass("/swap")}>
-            Swap
           </Link>
           <Link href="/escrows" className={navLinkClass("/escrows")}>
             Offers

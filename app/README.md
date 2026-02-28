@@ -1,14 +1,17 @@
 # Matchbook - Decentralized Escrow Trading Platform
 
-Matchbook is a decentralized escrow trading platform built on Solana that enables users to securely trade USDC and USDT tokens through trustless escrow contracts. Create offers with custom terms, let others fulfill them, and get automatic refunds if deals aren't completed within your specified timeframe.
+Matchbook is a decentralized escrow trading platform built on Solana that enables users to securely trade any SPL tokens through trustless escrow contracts. Create offers with custom terms, let others fulfill them, and get automatic refunds if deals aren't completed within your specified timeframe.
 
 ## Features
 
 - 🔒 **Secure Escrow**: Funds are locked in smart contracts, released only when terms are met
-- 💱 **Flexible Trading**: Trade USDC for USDT or vice versa with custom exchange rates
+- 💱 **Flexible Trading**: Trade any SPL token with custom exchange rates - no more hardcoded USDC/USDT only!
+- 🌐 **Multi-Network**: Switch between Mainnet, Devnet, and Localnet with one click
+- 🎯 **Smart Token Selection**: Choose tokens manually by address or select from your wallet
 - ⏰ **Time Protection**: Set expiration times with automatic refunds if offers expire
-- 🌐 **Decentralized**: Built on Solana for fast, low-cost transactions
+- 🚀 **Fast Swaps**: Dedicated swap interface for quick trade fulfillment
 - 🎨 **Modern UI**: Beautiful, responsive interface built with Next.js and Tailwind CSS
+- 🔄 **Real Blockchain Data**: All escrow offers fetched directly from the blockchain (no mock data)
 
 ## What is Matchbook?
 
@@ -18,6 +21,7 @@ Matchbook is a peer-to-peer trading platform that uses Solana smart contracts to
 - **Expiration Times**: Decide how long your offers remain valid
 - **Counterparties**: Choose who fulfills your offers
 - **Refunds**: Automatic refunds when offers expire
+- **Token Freedom**: Trade ANY SPL token - no restrictions!
 
 ## Prerequisites
 
@@ -26,7 +30,7 @@ Before running this application, ensure you have:
 - Node.js 18+ installed
 - npm package manager
 - Phantom wallet (or other Solana-compatible wallet) installed
-- Access to Solana Devnet (for testing) or Mainnet (for production)
+- Access to Solana network (network selected in-app)
 
 ## Installation
 
@@ -40,83 +44,97 @@ cd app
 npm i
 ```
 
-3. **Set up environment variables:**
-```bash
-cp .env.local.example .env.local
-```
-
-Edit `.env.local` with your configuration:
-```env
-NEXT_PUBLIC_SOLANA_NETWORK=devnet
-NEXT_PUBLIC_SOLANA_RPC_URL=https://api.devnet.solana.com
-NEXT_PUBLIC_PROGRAM_ID=A4L1zqBRLrnL2ma8Qxsg1WQ5gAkFxFzT6urQwiaDRhhm
-NEXT_PUBLIC_USDC_MINT=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
-NEXT_PUBLIC_USDT_MINT=Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB
-```
-
-## Running the App
-
-### Development Mode
+3. **Run the app:**
 ```bash
 npm run dev
 ```
 
 The app will be available at [http://localhost:3000](http://localhost:3000)
 
-### Production Build
-```bash
-npm run build
-npm start
-```
-
 ## Project Structure
 
 ```
 app/
 ├── app/                    # Next.js app directory (App Router)
-│   ├── create/            # Create escrow page
-│   ├── escrows/           # View all escrows page
+│   ├── create/            # Create escrow page with token selector
+│   ├── swap/              # Dedicated swap interface page
+│   ├── escrows/           # View all escrows page with real blockchain data
 │   ├── page.tsx           # Home page
-│   ├── layout.tsx         # Root layout with wallet providers
+│   ├── layout.tsx         # Root layout with wallet providers and network context
 │   └── globals.css        # Global styles
 ├── components/            # Reusable components
+│   ├── WalletProviders.tsx  # Wallet providers with network selector
+│   └── Header.tsx          # Navigation with network selector
 ├── lib/                   # Utility functions
-│   ├── solana.ts          # Solana program interactions
-│   └── constants.ts      # App constants
-├── public/                # Static assets
-├── next.config.js         # Next.js configuration
-├── tailwind.config.ts     # Tailwind CSS configuration
-└── package.json           # Dependencies and scripts
+│   ├── solana.ts          # Solana program interactions (real blockchain data)
+│   ├── constants.ts      # App constants (PROGRAM_ID, TOKEN_PROGRAM_ID, etc.)
+└── public/                # Static assets
 ```
 
 ## How to Use the App
 
 ### 1. Connect Your Wallet
-- Click the "Connect Wallet" button in the top right
+- Click "Connect Wallet" button in the top right
 - Select your Phantom wallet (or other supported wallet)
 - Approve the connection
 
-### 2. Create an Escrow Offer
-- Navigate to the "Create Offer" page
-- Select the token you want to offer (USDC or USDT)
+### 2. Select Network (New!)
+- Click the network selector in the top right (next to wallet button)
+- Choose from: Mainnet, Devnet, or Localnet
+- Network preference is saved to localStorage
+- **Note**: Reload the page after switching networks
+
+### 3. Create an Escrow Offer
+- Navigate to "Create Offer" page
+- Choose token input mode:
+  - **Manual Mode**: Type/paste any token mint address
+  - **My Tokens Mode**: Select from tokens already in your wallet
 - Enter the amount you want to trade
-- Select the token you want to receive
+- Token metadata (name, symbol, decimals) is fetched automatically
+- Select the token you want to receive (same two modes available)
 - Enter the target amount
-- Set the expiration time (in seconds, minutes, or hours)
+- Set expiration time (in seconds, minutes, or hours)
 - Click "Create Escrow Offer"
-- Confirm the transaction in your wallet
+- Confirm transaction in your wallet
 
-### 3. View and Fulfill Offers
-- Navigate to the "View Offers" page
-- Browse available escrow offers
+### 4. Swap Tokens (New!)
+- Navigate to "Swap" page
+- Browse all available escrow offers
+- View token metadata and exchange rates
+- Click "Fulfill Offer" to complete a swap
+- Receive tokens directly to your wallet!
+
+### 5. View and Fulfill Offers
+- Navigate to "View Offers" page
+- Filter by: All, Active Only, or Expired Only
+- Browse available escrow offers with real blockchain data
 - Click "Deal" to fulfill an offer
-- Confirm the transaction in your wallet
-- Receive the tokens!
+- Confirm transaction in your wallet
+- Receive tokens!
 
-### 4. Refund Expired Offers
+### 6. Refund Expired Offers
 - Expired offers show "Refund Your Funds" button
 - Click to refund your deposited tokens
-- Only the original maker can refund
+- Only the original maker can refund their offers
+
+## Network Support
+
+The application supports three networks (selectable in the UI):
+
+### Mainnet
+- For production use
+- Real tokens and transactions
+- Higher gas fees
+
+### Devnet (Default)
+- For testing
+- Test tokens available from faucets
+- No real money involved
+
+### Localnet
+- For development and testing
+- Run your own validator
+- Full control over environment
 
 ## Smart Contract Integration
 
@@ -131,18 +149,25 @@ The program provides four main instructions:
 3. **deal_token**: Fulfill an escrow offer
 4. **refund**: Refund from expired escrow
 
-## Token Addresses
+All data is fetched directly from the blockchain - no mock data used!
 
-### Devnet (Default)
-- **USDC**: `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`
-- **USDT**: `Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB`
+## Token Support
 
-### Mainnet (For Production)
-Update the mint addresses in `.env.local` to use mainnet addresses.
+### Any SPL Token
+The app supports ANY SPL token on Solana, not just USDC/USDT:
+- Manual entry of any token mint address
+- Automatic metadata fetching (name, symbol, decimals)
+- Select from your wallet's existing tokens
+
+### Token Metadata
+When you enter a token address, the app automatically fetches:
+- **Decimals**: Number of decimal places
+- **Name**: Token name (or truncated address)
+- **Symbol**: Token symbol (or truncated address prefix)
 
 ## Testing
 
-Run the Anchor tests to verify the smart contract:
+Run Anchor tests to verify the smart contract:
 ```bash
 cd ..
 anchor test
@@ -151,19 +176,29 @@ anchor test
 ## Troubleshooting
 
 ### Wallet Connection Issues
-- Ensure you have the Phantom wallet installed
-- Switch to Devnet in your wallet settings
+- Ensure you have Phantom wallet installed
+- Switch to the correct network (check network selector in app!)
 - Ensure you have some SOL for transaction fees
 
 ### Transaction Failures
 - Check your token balances
 - Ensure you have enough SOL for fees
-- Verify the program ID is correct
-- Check the console for error messages
+- Verify program ID is correct (see constants.ts)
+- Check console for error messages
+
+### Network Switching Issues
+- Reload the page after changing networks
+- Clear browser cache if issues persist
+- Check that your wallet is on the same network
 
 ### Build Errors
-- Clear the Next.js cache: `rm -rf .next`
+- Clear Next.js cache: `rm -rf .next`
 - Reinstall dependencies: `rm -rf node_modules && npm i`
+
+### Token Address Issues
+- Verify you're entering a valid Solana address
+- Ensure the mint account exists on the selected network
+- Check that you have balance in the selected token
 
 ## Security Considerations
 
@@ -171,15 +206,30 @@ anchor test
 - Double-check token addresses and amounts
 - Only use trusted wallets
 - Test thoroughly on devnet before using mainnet
+- Verify network before making transactions
+
+## Recent Improvements
+
+### v1.1.0
+- ✅ Removed all mock data - now using real blockchain data
+- ✅ Added network selector (Mainnet/Devnet/Localnet)
+- ✅ Added token selector with Manual and Wallet dropdown modes
+- ✅ Support for ANY SPL token (not just USDC/USDT)
+- ✅ Added dedicated Swap page for quick trading
+- ✅ Fixed Buffer writeBigUInt64LE error
+- ✅ Fixed TOKEN_PROGRAM_ID import issues
+- ✅ Added automatic token metadata fetching
 
 ## Future Enhancements
 
 - [ ] Real-time escrow updates via websockets
 - [ ] Price suggestions based on market rates
 - [ ] Advanced filtering and sorting
-- [ ] User dashboard with history
+- [ ] User dashboard with trading history
 - [ ] Multi-wallet support
 - [ ] Mobile app version
+- [ ] Token approval UI for custom tokens
+- [ ] Advanced charting and analytics
 
 ## License
 
@@ -188,9 +238,10 @@ ISC
 ## Support
 
 For issues and questions:
-1. Check the troubleshooting section
-2. Review the Solana logs in your browser console
+1. Check the troubleshooting section above
+2. Review Solana logs in your browser console
 3. Refer to the Anchor test file for examples
+4. Ensure you're on the correct network
 
 ## Contributing
 

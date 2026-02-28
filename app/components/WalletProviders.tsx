@@ -14,6 +14,7 @@ import {
   useState,
   useEffect,
   useMemo,
+  useCallback,
 } from "react";
 
 // Network types
@@ -50,11 +51,30 @@ interface NetworkContextType {
 
 const NetworkContext = createContext<NetworkContextType | undefined>(undefined);
 
+// Connection error context
+interface ConnectionErrorContextType {
+  connectionError: string | null;
+  clearConnectionError: () => void;
+}
+
+const ConnectionErrorContext = createContext<
+  ConnectionErrorContextType | undefined
+>(undefined);
+
 // Custom hook to use network context
 export function useNetwork() {
   const context = useContext(NetworkContext);
   if (!context) {
     throw new Error("useNetwork must be used within NetworkProvider");
+  }
+  return context;
+}
+
+// Custom hook to use connection error context
+export function useConnectionError() {
+  const context = useContext(ConnectionErrorContext);
+  if (!context) {
+    throw new Error("useConnectionError must be used within WalletProviders");
   }
   return context;
 }
@@ -168,6 +188,8 @@ export default function WalletProviders({ children }: { children: ReactNode }) {
     toNetwork: "devnet",
     show: false,
   });
+  const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [autoConnectEnabled, setAutoConnectEnabled] = useState(true);
 
   // Load network from localStorage on mount
   useEffect(() => {
@@ -199,34 +221,114 @@ export default function WalletProviders({ children }: { children: ReactNode }) {
 
   // Reload page to apply network change
   const handleReload = () => {
+    setConnectionError(null);
     window.location.reload();
   };
+
+  // Clear connection error
+  const clearConnectionError = useCallback(() => {
+    setConnectionError(null);
+  }, []);
+
+  // Handle wallet connection errors
+  useEffect(() => {
+    const handleError = (error: ErrorEvent) => {
+      console.error("Wallet connection error:", error);
+      if (
+        error.message.includes("timeout") ||
+        error.message.includes("failed to connect")
+      ) {
+        setConnectionError(
+          "Failed to connect to network. Please try again or check your network connection."
+        );
+      }
+    };
+
+    window.addEventListener("error", handleError);
+    return () => window.removeEventListener("error", handleError);
+  }, []);
 
   // Memoize endpoint based on network
   const endpoint = useMemo(() => NETWORK_CONFIG[network].endpoint, [network]);
 
-  // Memoize wallets
-  const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
+  // Memoize wallets with error handling
+  const wallets = useMemo(() => {
+    const phantom = new PhantomWalletAdapter();
+    phantom.on("error", (error) => {
+      console.error("Phantom wallet error:", error);
+      setConnectionError(`Wallet error: ${error.message}`);
+    });
+    return [phantom];
+  }, []);
+
+  // WalletProvider onError handler
+  const onWalletError = useCallback((error: Error) => {
+    console.error("WalletProvider error:", error);
+    setConnectionError(`Connection error: ${error.message}`);
+  }, []);
 
   // Don't render until mounted (prevents SSR issues)
   if (!mounted) {
     return null;
   }
 
+  // Connection error display
+  if (connectionError) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
+        <div className="bg-gray-900 border border-red-500 rounded-lg p-8 max-w-md mx-4">
+          <div className="text-center">
+            <div className="text-4xl mb-4">⚠️</div>
+            <h3 className="text-xl font-bold text-red-400 mb-2">
+              Connection Error
+            </h3>
+            <p className="text-gray-300 mb-4">{connectionError}</p>
+            <div className="space-y-2">
+              <button
+                onClick={clearConnectionError}
+                className="w-full bg-purple-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={handleReload}
+                className="w-full bg-gray-700 text-white font-semibold px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                Reload Page
+              </button>
+            </div>
+            <p className="text-gray-500 text-sm mt-4">
+              Make sure you have the Phantom wallet extension installed and your
+              network connection is stable.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <NetworkContext.Provider value={{ network, setNetwork, endpoint }}>
-      {networkChange.show && (
-        <NetworkChangeBanner
-          fromNetwork={networkChange.fromNetwork || "devnet"}
-          toNetwork={networkChange.toNetwork}
-          onReload={handleReload}
-        />
-      )}
-      <ConnectionProvider endpoint={endpoint}>
-        <WalletProvider wallets={wallets} autoConnect>
-          <WalletModalProvider>{children}</WalletModalProvider>
-        </WalletProvider>
-      </ConnectionProvider>
+      <ConnectionErrorContext.Provider
+        value={{ connectionError, clearConnectionError }}
+      >
+        {networkChange.show && (
+          <NetworkChangeBanner
+            fromNetwork={networkChange.fromNetwork || "devnet"}
+            toNetwork={networkChange.toNetwork}
+            onReload={handleReload}
+          />
+        )}
+        <ConnectionProvider endpoint={endpoint}>
+          <WalletProvider
+            wallets={wallets}
+            autoConnect={autoConnectEnabled}
+            onError={onWalletError}
+          >
+            <WalletModalProvider>{children}</WalletModalProvider>
+          </WalletProvider>
+        </ConnectionProvider>
+      </ConnectionErrorContext.Provider>
     </NetworkContext.Provider>
   );
 }

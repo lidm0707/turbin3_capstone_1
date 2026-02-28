@@ -220,6 +220,35 @@ anchor test
 - ✅ Fixed TOKEN_PROGRAM_ID import issues
 - ✅ Added automatic token metadata fetching
 
+## 🚀 Deployment
+
+### Quick Deploy to Vercel
+
+The easiest way to deploy your Matchbook application is using Vercel:
+
+1. **Push your code to GitHub**
+2. **Import to Vercel** - Vercel will auto-detect Next.js
+3. **Configure environment variables** (optional)
+4. **Deploy** - Takes 1-2 minutes
+
+For detailed step-by-step instructions, see **[DEPLOYMENT.md](./DEPLOYMENT.md)**
+
+### Deployment Options
+
+- **Vercel** (Recommended) - Free tier, auto-deploys from Git
+- **Netlify** - Alternative platform
+- **Self-hosted** - Deploy to your own server
+
+### Production Considerations
+
+For mainnet deployments:
+- Use private RPC endpoints (Helius, QuickNode, Alchemy)
+- Configure proper monitoring and error tracking
+- Test thoroughly on devnet first
+- Set up custom domain
+
+See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for complete deployment guide including troubleshooting and production setup.
+
 ## Future Enhancements
 
 - [ ] Real-time escrow updates via websockets

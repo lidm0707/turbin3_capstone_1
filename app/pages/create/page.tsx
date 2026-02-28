@@ -11,7 +11,7 @@ import {
   getMint,
 } from "@solana/spl-token";
 import Link from "next/link";
-import idlJson from "../../../target/idl/capstone_1.json";
+import idlJson from "../../idl/capstone_1.json";
 import * as anchor from "@coral-xyz/anchor";
 
 // Use the IDL directly with type assertion

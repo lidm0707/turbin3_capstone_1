@@ -9,9 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
-    "lint:check": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
-    "copy-idl": "node scripts/copy-idl.js",
-    "postbuild": "npm run copy-idl"
+    "lint:check": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1",

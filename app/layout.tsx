@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Header from "@/components/Header";
 import WalletProviders from "@/components/WalletProviders";
-import "./globals.css";
+import "../globals.css";
 
 // Default styles that can be overridden by your app
 

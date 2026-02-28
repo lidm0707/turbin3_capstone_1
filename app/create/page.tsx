@@ -11,7 +11,7 @@ import {
   getMint,
 } from "@solana/spl-token";
 import Link from "next/link";
-import idlJson from "../../idl/capstone_1.json";
+import idlJson from "../idl/capstone_1.json";
 import * as anchor from "@coral-xyz/anchor";
 
 // Use the IDL directly with type assertion
@@ -24,8 +24,8 @@ import {
   userExists,
   getOrCreateTokenAccount,
   toTokenAmount,
-} from "../../lib/solana";
-import { TOKEN_PROGRAM_ID } from "../../lib/constants";
+} from "../lib/solana";
+import { TOKEN_PROGRAM_ID } from "../lib/constants";
 
 export default function CreateEscrow() {
   const { publicKey, connected, signTransaction } = useWallet();
@@ -599,7 +599,9 @@ export default function CreateEscrow() {
                       type="text"
                       value={makerTokenAddress}
                       onChange={(e) =>
-                        handleMakerTokenAddressChange(e.target.value)
+                        handleMakerTokenAddressChange(
+                          (e.target as HTMLInputElement).value
+                        )
                       }
                       placeholder="Enter token mint address"
                       className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 pr-20"
@@ -617,7 +619,7 @@ export default function CreateEscrow() {
                   <select
                     value={selectedMakerToken}
                     onChange={(e) => {
-                      const value = e.target.value;
+                      const value = (e.target as HTMLSelectElement).value;
                       setSelectedMakerToken(value);
                       setMakerTokenAddress(value);
                       handleMakerTokenAddressChange(value);
@@ -680,7 +682,9 @@ export default function CreateEscrow() {
                   }
                   min="0"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={(e) =>
+                    setAmount((e.target as HTMLInputElement).value)
+                  }
                   placeholder="Enter amount"
                   className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
                 />
@@ -738,7 +742,9 @@ export default function CreateEscrow() {
                       type="text"
                       value={takerTokenAddress}
                       onChange={(e) =>
-                        handleTakerTokenAddressChange(e.target.value)
+                        handleTakerTokenAddressChange(
+                          (e.target as HTMLInputElement).value
+                        )
                       }
                       placeholder="Enter token mint address"
                       className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 pr-20"
@@ -756,7 +762,7 @@ export default function CreateEscrow() {
                   <select
                     value={selectedTakerToken}
                     onChange={(e) => {
-                      const value = e.target.value;
+                      const value = (e.target as HTMLSelectElement).value;
                       setSelectedTakerToken(value);
                       setTakerTokenAddress(value);
                       handleTakerTokenAddressChange(value);
@@ -819,7 +825,9 @@ export default function CreateEscrow() {
                   }
                   min="0"
                   value={targetAmount}
-                  onChange={(e) => setTargetAmount(e.target.value)}
+                  onChange={(e) =>
+                    setTargetAmount((e.target as HTMLInputElement).value)
+                  }
                   placeholder="Enter amount"
                   className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
                 />
@@ -858,13 +866,22 @@ export default function CreateEscrow() {
                     type="number"
                     min="1"
                     value={expireTime}
-                    onChange={(e) => setExpireTime(e.target.value)}
+                    onChange={(e) =>
+                      setExpireTime((e.target as HTMLInputElement).value)
+                    }
                     placeholder="Enter time"
                     className="flex-1 px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
                   />
                   <select
                     value={timeUnit}
-                    onChange={(e) => setTimeUnit(e.target.value as any)}
+                    onChange={(e) =>
+                      setTimeUnit(
+                        (e.target as HTMLSelectElement).value as
+                          | "seconds"
+                          | "minutes"
+                          | "hours"
+                      )
+                    }
                     className="px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:outline-none focus:border-purple-500"
                   >
                     <option value="seconds">Seconds</option>

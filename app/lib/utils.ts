@@ -368,7 +368,7 @@ export async function fetchTokenMetadata(
             try {
               const response = await fetch(uri);
               if (response.ok) {
-                const json = await response.json();
+                const json = (await response.json()) as { image?: string };
                 image = json.image;
               }
             } catch (err) {

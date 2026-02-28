@@ -20,6 +20,7 @@ import {
   deriveEscrowPda,
   deriveVaultAddress,
   toTokenAmount,
+  getOrCreateTokenAccount,
 } from "../lib/solana";
 
 interface EscrowData {
@@ -263,11 +264,13 @@ export default function EscrowsPage() {
         escrow.tokenA,
         escrow.maker
       );
-      const takerAtaA = await getAssociatedTokenAddress(
+      const takerAtaA = await getOrCreateTokenAccount(
+        provider,
         escrow.tokenA,
         publicKey
       );
-      const takerAtaB = await getAssociatedTokenAddress(
+      const takerAtaB = await getOrCreateTokenAccount(
+        provider,
         escrow.tokenB,
         publicKey
       );
@@ -275,6 +278,14 @@ export default function EscrowsPage() {
         escrow.tokenB,
         escrow.maker
       );
+
+      // Check if maker's ATA B exists
+      const makerAtaBInfo = await provider.connection.getAccountInfo(makerAtaB);
+      if (!makerAtaBInfo) {
+        throw new Error(
+          "Maker does not have an associated token account for token B. The maker needs to initialize their token account first."
+        );
+      }
 
       // Fulfill the escrow
       const tx = await dealToken(

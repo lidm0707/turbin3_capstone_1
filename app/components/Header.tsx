@@ -21,7 +21,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+            <div className="text-2xl font-bold bg-linear-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
               Matchbook
             </div>
           </Link>
@@ -43,7 +43,7 @@ export default function Header() {
           {/* Wallet Button */}
           <div className="flex items-center space-x-4">
             <NetworkSelector />
-            <WalletMultiButton className="!bg-purple-600 hover:!bg-purple-700 !text-white !font-semibold !px-6 !py-2 !rounded-lg transition-colors" />
+            <WalletMultiButton className="bg-purple-600! hover:bg-purple-700! text-white! font-semibold! px-6! py-2! rounded-lg! transition-colors" />
           </div>
         </div>
 

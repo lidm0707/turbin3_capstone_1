@@ -9,12 +9,12 @@ export default function Home() {
   const { connected } = useWallet();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-purple-900 to-gray-900">
       {/* Hero Section */}
       <section className="px-4 py-16">
         <div className="container mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-            <span className="bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
               Matchbook
             </span>
             <span className="text-gray-300"> Escrow System</span>
@@ -106,7 +106,7 @@ export default function Home() {
           {/* Step 1 */}
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-purple-500/30 mb-8">
             <div className="flex items-start gap-6">
-              <div className="flex-shrink-0 w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">
+              <div className="shrink-0 w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">
                 1
               </div>
               <div className="flex-1">
@@ -134,7 +134,7 @@ export default function Home() {
           {/* Step 2 */}
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-purple-500/30 mb-8">
             <div className="flex items-start gap-6">
-              <div className="flex-shrink-0 w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">
+              <div className="shrink-0 w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">
                 2
               </div>
               <div className="flex-1">
@@ -164,7 +164,7 @@ export default function Home() {
           {/* Step 3 */}
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-purple-500/30 mb-8">
             <div className="flex items-start gap-6">
-              <div className="flex-shrink-0 w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">
+              <div className="shrink-0 w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">
                 3
               </div>
               <div className="flex-1">
@@ -193,7 +193,7 @@ export default function Home() {
           {/* Step 4 */}
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-purple-500/30 mb-8">
             <div className="flex items-start gap-6">
-              <div className="flex-shrink-0 w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">
+              <div className="shrink-0 w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">
                 4
               </div>
               <div className="flex-1">

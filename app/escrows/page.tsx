@@ -485,7 +485,7 @@ export default function EscrowsPage() {
             <p className="text-gray-300 text-lg mb-6">
               Connect your wallet to deal with escrows
             </p>
-            <WalletMultiButton className="!bg-purple-600 hover:!bg-purple-700 !text-white !font-semibold !px-8 !py-3 !rounded-lg !text-lg" />
+            <WalletMultiButton className="bg-purple-600! hover:bg-purple-700! text-white! font-semibold! px-8! py-3! rounded-lg! text-lg!" />
           </div>
         ) : loading ? (
           <div className="text-center py-12">
@@ -619,7 +619,7 @@ export default function EscrowsPage() {
                       <button
                         onClick={() => handleDeal(escrow)}
                         disabled={loading || !connected || isMaker}
-                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {loading
                           ? "Processing..."

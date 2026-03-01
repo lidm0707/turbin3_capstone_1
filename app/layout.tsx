@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <WalletProviders>
-          <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
+          <div className="min-h-screen bg-linear-to-br from-gray-900 via-purple-900 to-gray-900">
             <Header />
             <main className="container mx-auto">{children}</main>
           </div>

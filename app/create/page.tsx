@@ -548,7 +548,7 @@ export default function CreateEscrow() {
               <p className="text-gray-300 text-lg mb-6">
                 Connect your wallet to create an escrow
               </p>
-              <WalletMultiButton className="!bg-purple-600 hover:!bg-purple-700 !text-white !font-semibold !px-8 !py-3 !rounded-lg !text-lg" />
+              <WalletMultiButton className="bg-purple-600!hover:!bg-purple-700 text-white! font-semibold! px-8! py-3! !rounded-lg! text-lg!" />
             </div>
           ) : (
             <div className="space-y-6">
@@ -917,7 +917,7 @@ export default function CreateEscrow() {
                   !makerTokenMetadata.valid ||
                   !takerTokenMetadata.valid
                 }
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Creating Escrow..." : "Create Escrow Offer"}
               </button>
